@@ -45,6 +45,16 @@ function Trash() {
       unsubscribe();
     };
   }, []);
+  if (items.length === 0) {
+    return (
+      <div className="flex h-full items-center justify-center px-5">
+        <h1 className="text-3xl font-medium">
+          You have no snippets in the trash{" "}
+          <span className="text-red-500 underline">currently</span>
+        </h1>
+      </div>
+    );
+  }
   return (
     <>
       <BentoGrid className="mx-auto max-w-5xl px-6 py-3">

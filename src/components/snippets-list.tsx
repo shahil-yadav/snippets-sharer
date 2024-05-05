@@ -13,6 +13,7 @@ import { db } from "../lib/firebase/database";
 import { TItems } from "../types";
 import { BentoGrid, BentoGridItem } from "./ui/bento-grid";
 import Skeleton from "./ui/skeleton";
+import { cn } from "../utils/cn";
 
 function SnippetsList() {
   const { user } = useAuthContext();
@@ -32,12 +33,10 @@ function SnippetsList() {
       code: ``,
     };
     try {
-      const snippetRef = await addDoc(collection(db, "snippets"), {
-        snippet: snippetObj,
-      });
+      const snippetRef = await addDoc(collection(db, "snippets"), snippetObj);
       await addDoc(collection(db, "users"), {
         action: "created",
-        snippet: snippetObj,
+        ...snippetObj,
         snippetRef: snippetRef.id,
         uid: user.uid,
       });
@@ -59,11 +58,11 @@ function SnippetsList() {
             setItems((prev) => [
               ...prev,
               {
-                description: data.snippet.language,
-                header: <Skeleton code={data.snippet.code} />,
+                description: data.language,
+                header: <Skeleton code={data.code} />,
                 icon: <IconCode className="h-5 w-5 text-neutral-500" />,
                 snippetRef: data.snippetRef,
-                title: data.snippet.title,
+                title: data.title,
               },
             ]);
         }
@@ -84,7 +83,10 @@ function SnippetsList() {
         {items.map((item, i) => (
           <BentoGridItem
             key={i}
-            className={i > 0 && i % 2 === 1 ? "md:col-span-2" : ""}
+            className={cn(
+              i === 3 || i === 6 ? "md:col-span-2" : "",
+              "cursor-pointer",
+            )}
             description={item.description}
             header={item.header}
             icon={item.icon}
@@ -95,13 +97,14 @@ function SnippetsList() {
         ))}
       </BentoGrid>
       <Button
-        className="fixed bottom-[10%] right-0 h-14 sm:right-[5%] md:right-[7%]"
+        className="fixed bottom-[10%] right-5"
         color="success"
+        isIconOnly
         onPress={handleAddButtonPress}
-        radius="sm"
+        radius="full"
         size="lg"
       >
-        <IconPlus className="dark:text-white" />
+        <IconPlus className="text-white" />
       </Button>
     </>
   );

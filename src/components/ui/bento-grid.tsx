@@ -1,5 +1,6 @@
 import {
   Button,
+  Link,
   Modal,
   ModalBody,
   ModalContent,
@@ -19,7 +20,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../lib/firebase/database";
 import { cn } from "../../utils/cn";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export const BentoGrid = ({
   className,
@@ -60,6 +61,7 @@ export const BentoGridItem = ({
   snippetRef: string;
 }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   async function handleDeleteSnippet(
     mode: "trash" | "delete",
@@ -148,6 +150,9 @@ export const BentoGridItem = ({
       );
     }
   }
+  function handleRedirect() {
+    navigate(`/snippet/${snippetRef}`);
+  }
   return (
     <>
       <div
@@ -155,6 +160,7 @@ export const BentoGridItem = ({
           "group/bento shadow-input row-span-1 flex flex-col justify-between space-y-4 rounded-xl border border-transparent bg-white p-4 transition duration-200 hover:shadow-xl dark:border-white/[0.2] dark:bg-black dark:shadow-none",
           className,
         )}
+        onClick={handleRedirect}
       >
         {header}
         <div className="flex items-center justify-between">
@@ -169,11 +175,16 @@ export const BentoGridItem = ({
           </div>
           <div className="flex gap-2">
             {location.pathname === "/trash" && (
-              <Button color="success" onPress={handleRestoreSnippet}>
+              <Button color="success" isIconOnly onPress={handleRestoreSnippet}>
                 <IconRestore />
               </Button>
             )}
-            <Button onPress={onOpen} color="danger">
+            <Button
+              isIconOnly
+              aria-label="Trash"
+              onPress={onOpen}
+              color="danger"
+            >
               <IconTrash />
             </Button>
           </div>

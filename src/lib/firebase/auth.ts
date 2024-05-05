@@ -4,11 +4,12 @@ import {
   signInWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "./database";
 import { app } from "./init";
 
 // Initialize Firebase Authentication and get a reference to the service
 const auth = getAuth(app);
-
 function signup({
   email,
   password,
@@ -22,19 +23,23 @@ function signup({
 }) {
   createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
+      const avatarUrl = `https://api.dicebear.com/8.x/initials/svg?seed=${name}`;
       const user = userCredential.user;
-      console.log(
-        "🚀 ~ file: auth.ts:26 ~ user:",
-        "✅ Successfully updated user",
-      );
       updateProfile(user, {
         displayName: name,
+        photoURL: avatarUrl,
       })
-        .then(() => {
-          console.log(
-            "🚀 ~ file: auth.ts:29 ~ msg:",
-            "✅ Successfully updated profile picture",
-          );
+        .then(async () => {
+          try {
+            await setDoc(doc(db, "accounts", user.uid), {
+              uid: user.uid,
+              email: user.email,
+              name: user.displayName,
+              avatar: avatarUrl,
+            });
+          } catch (error) {
+            console.log("🚀 ~ file: auth.ts:50 ~ error:", error);
+          }
         })
         .catch((error) => {
           console.error(
@@ -64,4 +69,4 @@ function login({ email, password }: { email: string; password: string }) {
     });
 }
 
-export { signup, login };
+export { login, signup };

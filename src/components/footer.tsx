@@ -1,41 +1,39 @@
-import { Button, Link } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
 import { IconHome, IconTrashFilled, IconUsers } from "@tabler/icons-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Footer() {
   const location = useLocation();
+  const navigate = useNavigate();
   return (
     <div className="flex items-center justify-center gap-7 py-5">
       <Button
         color={location.pathname === "/" ? "secondary" : "default"}
+        onPress={() => navigate("/")}
         radius="full"
         variant="ghost"
       >
-        <Link href="/" color="foreground">
-          <IconHome />
-        </Link>
+        <IconHome />
       </Button>
 
       <Button
         color={
           location.pathname === "/shared-with-me" ? "secondary" : "default"
         }
+        onClick={() => navigate("/shared-with-me")}
         radius="full"
         variant="flat"
       >
-        <Link href="/shared-with-me" color="foreground">
-          <IconUsers />
-        </Link>
+        <IconUsers />
       </Button>
 
       <Button
         color={location.pathname === "/trash" ? "danger" : "default"}
+        onClick={() => navigate("/trash")}
         radius="full"
         variant="solid"
       >
-        <Link color="foreground" href="/trash">
-          <IconTrashFilled />
-        </Link>
+        <IconTrashFilled />
       </Button>
     </div>
   );

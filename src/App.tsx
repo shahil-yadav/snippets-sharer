@@ -15,11 +15,14 @@ function App() {
   const navigate = useNavigate();
   const { user, setUser } = useAuthContext();
   useEffect(() => {
-    onAuthStateChanged(auth, (user_snapshot) => {
+    const unsub = onAuthStateChanged(auth, (user_snapshot) => {
       if (user_snapshot && !user) {
         setUser(user_snapshot);
       } else if (!user_snapshot) setUser(null);
     });
+    return () => {
+      unsub();
+    };
   }, []);
   return (
     <NextUIProvider navigate={navigate}>
@@ -30,7 +33,6 @@ function App() {
           <Route path="shared-with-me" element={<SharedWithMe />} />
           <Route path="snippet/:id" element={<Snippet />} />
         </Route>
-
         <Route
           path="/404"
           element={<h1 className="text-red-500">404! Not found</h1>}
