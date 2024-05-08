@@ -5,11 +5,16 @@ import { db } from "../lib/firebase/database";
 
 function MembersGroup({ members }: { members: string[] }) {
   const [accounts, setAccounts] = useState<DocumentData[]>([]);
-  console.log(
-    "🚀 ~ file: members-group.tsx:8 ~ MembersGroup ~ accounts:",
-    accounts,
-  );
   useEffect(() => {
+    // Case of Deletion:
+    if (members.length < accounts.length) {
+      const accountUid = accounts.map((account) => account.uid);
+      accountUid.forEach((uid) => {
+        if (!members.includes(uid))
+          setAccounts((prev) => [...prev.filter((item) => item.uid !== uid)]);
+      });
+      return;
+    }
     members.forEach(async (uid) => {
       const accountDoc = await getDoc(doc(db, "accounts", uid));
       if (!accountDoc.exists()) return;
@@ -20,7 +25,7 @@ function MembersGroup({ members }: { members: string[] }) {
         else return [...prev, account];
       });
     });
-  }, [members]);
+  }, [members, accounts.length]);
   return (
     <AvatarGroup>
       {accounts.map((account) => (

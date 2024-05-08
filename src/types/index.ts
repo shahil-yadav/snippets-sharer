@@ -4,6 +4,7 @@ export enum AuthStates {
 }
 
 export type TItems = {
+  documentId?: string;
   description: string;
   header: JSX.Element;
   icon: JSX.Element;

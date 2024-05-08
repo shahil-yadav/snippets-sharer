@@ -1,19 +1,22 @@
 import { Button } from "@nextui-org/react";
-import { IconCode, IconPlus } from "@tabler/icons-react";
+import { IconCodeCircle, IconPlus } from "@tabler/icons-react";
 import {
   addDoc,
   collection,
+  doc,
+  getDoc,
   onSnapshot,
   query,
   where,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { useAuthContext } from "../context/auth-provider";
+import { availLanguages, defaultIndex } from "../constants";
+import { useAuthContext } from "../context/useAuthContext";
 import { db } from "../lib/firebase/database";
 import { TItems } from "../types";
+import { cn } from "../utils/cn";
 import { BentoGrid, BentoGridItem } from "./ui/bento-grid";
 import Skeleton from "./ui/skeleton";
-import { cn } from "../utils/cn";
 
 function SnippetsList() {
   const { user } = useAuthContext();
@@ -23,20 +26,16 @@ function SnippetsList() {
       alert("You aren't logged in!");
       return;
     }
-    const date = new Date();
-    const language = "javascript";
-    const title = `Snippet: ${date.toTimeString().split(" ")[0]}`;
-    const snippetObj = {
-      members: [user.uid],
-      language,
-      title,
-      code: ``,
-    };
     try {
-      const snippetRef = await addDoc(collection(db, "snippets"), snippetObj);
+      const date = new Date();
+      const snippetRef = await addDoc(collection(db, "snippets"), {
+        members: [user.uid],
+        language: availLanguages[defaultIndex].editorLanguage,
+        title: `Snippet: ${date.toTimeString().split(" ")[0]}`,
+        code: availLanguages[defaultIndex].defaultCode,
+      });
       await addDoc(collection(db, "users"), {
         action: "created",
-        ...snippetObj,
         snippetRef: snippetRef.id,
         uid: user.uid,
       });
@@ -50,31 +49,35 @@ function SnippetsList() {
   useEffect(() => {
     if (!user) return;
     const q = query(collection(db, "users"), where("uid", "==", user.uid));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        const data = change.doc.data();
-        if (change.type == "added") {
-          if (data.action === "created")
+    const unsub = onSnapshot(q, (snapshot) => {
+      snapshot.docChanges().forEach(async (change) => {
+        const users = change.doc.data();
+        if (change.type == "added" && users.action === "created") {
+          const snippetDoc = await getDoc(
+            doc(db, "snippets", users.snippetRef),
+          );
+          if (snippetDoc.exists()) {
+            const snippet = snippetDoc.data();
             setItems((prev) => [
               ...prev,
               {
-                description: data.language,
-                header: <Skeleton code={data.code} />,
-                icon: <IconCode className="h-5 w-5 text-neutral-500" />,
-                snippetRef: data.snippetRef,
-                title: data.title,
+                description: snippet.language,
+                header: <Skeleton code={snippet.code} />,
+                icon: <IconCodeCircle className="h-5 w-5 text-neutral-500" />,
+                snippetRef: users.snippetRef,
+                title: users.title,
               },
             ]);
-        }
-        if (change.type === "modified") {
-          setItems((prev) =>
-            prev.filter((item) => item.snippetRef !== data.snippetRef),
-          );
+          }
+        } else if (change.type == "modified" && users.action === "trashed") {
+          setItems((prev) => [
+            ...prev.filter((item) => item.snippetRef !== users.snippetRef),
+          ]);
         }
       });
     });
     return () => {
-      unsubscribe();
+      unsub();
     };
   }, []);
   return (

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { createContext } from "react";
 import { User } from "firebase/auth";
 
@@ -9,7 +9,7 @@ const defaulVal: {
   user: null,
   setUser: () => {},
 };
-const AuthContext = createContext(defaulVal);
+export const AuthContext = createContext(defaulVal);
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   return (
@@ -18,7 +18,5 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     </AuthContext.Provider>
   );
 }
-
-export const useAuthContext = () => useContext(AuthContext);
 
 export default AuthProvider;

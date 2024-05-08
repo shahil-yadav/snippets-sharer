@@ -16,13 +16,17 @@ function Signup({
   ) => {
     event.preventDefault();
     if (!email || !password) return;
-    signup({
-      email,
-      password,
-      info: {
-        name,
-      },
-    });
+    try {
+      await signup({
+        email,
+        password,
+        info: {
+          name,
+        },
+      });
+    } catch (error) {
+      console.error("📑 ~ file: signup.tsx:28 ~ error:", error);
+    }
   };
   return (
     <form className="flex h-[300px] flex-col gap-4" onSubmit={handleSignup}>

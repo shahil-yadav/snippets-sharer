@@ -2,10 +2,10 @@ import { NextUIProvider } from "@nextui-org/react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useEffect } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
-import SharedWithMe from "./components/shared-with-me";
+import SharedWithMe from "./pages/shared-with-me";
 import SnippetsList from "./components/snippets-list";
-import Trash from "./components/trash";
-import { useAuthContext } from "./context/auth-provider";
+import Trash from "./pages/trash";
+import { useAuthContext } from "./context/useAuthContext";
 import Auth from "./pages/auth";
 import Home from "./pages/home";
 import Snippet from "./pages/snippet";
@@ -24,6 +24,7 @@ function App() {
       unsub();
     };
   }, []);
+
   return (
     <NextUIProvider navigate={navigate}>
       <Routes>

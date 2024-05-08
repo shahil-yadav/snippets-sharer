@@ -1,6 +1,5 @@
 import {
   Button,
-  Link,
   Modal,
   ModalBody,
   ModalContent,
@@ -10,17 +9,19 @@ import {
 } from "@nextui-org/react";
 import { IconRestore, IconTrash } from "@tabler/icons-react";
 import {
+  arrayRemove,
   collection,
   deleteDoc,
   doc,
   getDocs,
   query,
+  runTransaction,
   updateDoc,
   where,
 } from "firebase/firestore";
+import { useLocation, useNavigate } from "react-router-dom";
 import { db } from "../../lib/firebase/database";
 import { cn } from "../../utils/cn";
-import { useLocation, useNavigate } from "react-router-dom";
 
 export const BentoGrid = ({
   className,
@@ -45,24 +46,31 @@ export const BentoGridItem = ({
   className,
   title,
   description,
+  documentId,
   header,
   modalBody,
   modalHeader,
   icon,
   snippetRef,
+  uid,
 }: {
   className?: string;
   title?: string | React.ReactNode;
   description?: string | React.ReactNode;
+  documentId?: string;
   header?: React.ReactNode;
   icon?: React.ReactNode;
-  modalHeader?: string;
+  modalHeader?:
+    | "Deleting the snippet to Trash"
+    | "Opt out of the snippet"
+    | "You are about to delete your snippet permanently, there's no going back after this";
   modalBody?: string;
   snippetRef: string;
+  uid?: string;
 }) => {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const location = useLocation();
   const navigate = useNavigate();
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   async function handleDeleteSnippet(
     mode: "trash" | "delete",
     onClose: () => void,
@@ -150,6 +158,25 @@ export const BentoGridItem = ({
       );
     }
   }
+  async function handleLeaveSnippet(onClose: () => void) {
+    if (!uid) return;
+    try {
+      await runTransaction(db, async (transaction) => {
+        transaction.update(doc(db, "snippets", snippetRef), {
+          members: arrayRemove(uid),
+        });
+        if (!documentId) return;
+        transaction.delete(doc(db, "users", documentId));
+      });
+    } catch (error) {
+      console.error(
+        "📑 ~ file: bento-grid.tsx:163 ~ handleLeaveSnippet ~ error:",
+        error,
+      );
+    } finally {
+      onClose();
+    }
+  }
   function handleRedirect() {
     navigate(`/snippet/${snippetRef}`);
   }
@@ -204,14 +231,20 @@ export const BentoGridItem = ({
                 </Button>
                 <Button
                   color="danger"
-                  onPress={() =>
+                  onPress={() => {
+                    if (location.pathname === "/shared-with-me") {
+                      handleLeaveSnippet(onClose);
+                      return;
+                    }
                     handleDeleteSnippet(
                       location.pathname === "/trash" ? "delete" : "trash",
                       onClose,
-                    )
-                  }
+                    );
+                  }}
                 >
-                  Delete
+                  {modalHeader === "Opt out of the snippet"
+                    ? "Leave"
+                    : "Delete"}
                 </Button>
               </ModalFooter>
             </>
