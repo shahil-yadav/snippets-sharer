@@ -2,18 +2,19 @@ import { NextUIProvider } from "@nextui-org/react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useEffect } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
-import SharedWithMe from "./pages/shared-with-me";
-import SnippetsList from "./components/snippets-list";
-import Trash from "./pages/trash";
+import SnippetsList from "./pages/snippets-list";
 import { useAuthContext } from "./context/useAuthContext";
 import Auth from "./pages/auth";
 import Home from "./pages/home";
+import SharedWithMe from "./pages/shared-with-me";
 import Snippet from "./pages/snippet";
+import Trash from "./pages/trash";
 
 function App() {
   const auth = getAuth();
   const navigate = useNavigate();
   const { user, setUser } = useAuthContext();
+
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user_snapshot) => {
       if (user_snapshot && !user) {
@@ -23,8 +24,7 @@ function App() {
     return () => {
       unsub();
     };
-  }, []);
-
+  }, [user, setUser, auth]);
   return (
     <NextUIProvider navigate={navigate}>
       <Routes>

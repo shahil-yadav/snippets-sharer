@@ -13,13 +13,11 @@ const auth = getAuth(app);
 async function signup({
   email,
   password,
-  info: { name },
+  name,
 }: {
   email: string;
   password: string;
-  info: {
-    name: string;
-  };
+  name: string;
 }) {
   const avatarUrl = `https://api.dicebear.com/8.x/initials/svg?seed=${name}`;
   try {
@@ -45,16 +43,12 @@ async function signup({
 }
 
 function login({ email, password }: { email: string; password: string }) {
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-    })
-    .catch((error) => {
-      console.error(
-        "🚀 ~ file: auth.ts:55 ~ signInWithEmailAndPassword ~ error:",
-        error,
-      );
-    });
+  signInWithEmailAndPassword(auth, email, password).catch((error) => {
+    console.error(
+      "🚀 ~ file: auth.ts:55 ~ signInWithEmailAndPassword ~ error:",
+      error,
+    );
+  });
 }
 
 export { login, signup };

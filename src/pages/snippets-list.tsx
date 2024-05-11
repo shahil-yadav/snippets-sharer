@@ -15,8 +15,8 @@ import { useAuthContext } from "../context/useAuthContext";
 import { db } from "../lib/firebase/database";
 import { TItems } from "../types";
 import { cn } from "../utils/cn";
-import { BentoGrid, BentoGridItem } from "./ui/bento-grid";
-import Skeleton from "./ui/skeleton";
+import { BentoGrid, BentoGridItem } from "../components/ui/bento-grid";
+import Skeleton from "../components/ui/skeleton";
 
 function SnippetsList() {
   const { user } = useAuthContext();

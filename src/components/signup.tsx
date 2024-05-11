@@ -20,9 +20,7 @@ function Signup({
       await signup({
         email,
         password,
-        info: {
-          name,
-        },
+        name,
       });
     } catch (error) {
       console.error("📑 ~ file: signup.tsx:28 ~ error:", error);
