@@ -9,6 +9,7 @@ const defaulVal: {
   user: null,
   setUser: () => {},
 };
+
 export const AuthContext = createContext(defaulVal);
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);

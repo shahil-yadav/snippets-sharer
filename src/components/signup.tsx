@@ -54,7 +54,11 @@ function Signup({
       />
       <p className="text-center text-small">
         Already have an account?{" "}
-        <Link size="sm" onPress={() => setSelected(AuthStates.login)}>
+        <Link
+          className="cursor-pointer"
+          size="sm"
+          onPress={() => setSelected(AuthStates.login)}
+        >
           Login
         </Link>
       </p>

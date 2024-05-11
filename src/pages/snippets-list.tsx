@@ -79,7 +79,7 @@ function SnippetsList() {
     return () => {
       unsub();
     };
-  }, []);
+  }, [user]);
   return (
     <>
       <BentoGrid className="mx-auto max-w-5xl px-6 py-3">

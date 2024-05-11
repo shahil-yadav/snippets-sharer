@@ -3,6 +3,7 @@ import { Header } from "../components/header";
 import Footer from "../components/footer";
 
 function Home() {
+  console.log("📑 ~ file: home.tsx:6 ~ Home ~ Home:");
   return (
     <main className="flex h-[100svh] flex-col  overflow-y-auto">
       <Header />

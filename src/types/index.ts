@@ -3,6 +3,10 @@ export enum AuthStates {
   signup = "Sign-up",
 }
 
+export enum WorkerThreadMessages {
+  onAuthStateChanged = "ON_AUTH_STATE_CHANGED",
+}
+
 export type TItems = {
   documentId?: string;
   description: string;

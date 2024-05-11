@@ -51,4 +51,4 @@ function login({ email, password }: { email: string; password: string }) {
   });
 }
 
-export { login, signup };
+export { auth, login, signup };
